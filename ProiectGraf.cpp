@@ -41,7 +41,7 @@ public:
 private:
     void DFS(int, bool[]);
     void topologicalSortingDFS(int, bool[], stack<int> &);
-    void criticalDFS(int, int &, vector<int> &, vector<int> &, vector<int> &, int &, vector<vector<int>> &);
+    void criticalDFS(int, int &, bool[], vector<int> &, vector<int> &, int &, vector<vector<int>> &);
     void stronglyConnectedComponentsDFS(int, int &, vector<int> &, vector<int> &, bool[], stack<int> &, vector<vector<int>> &);
     void biconnectedComponentsDFS(int, int &, int &, vector<int> &, vector<int> &, stack<int> &, vector<vector<int>> &);
 };
@@ -304,7 +304,7 @@ bool Graph::HavelHakimi(vector<int> degrees)
         }
     }
 }
-void Graph::criticalDFS(int node, int &parent, vector<int> &visited, vector<int> &lowestLevel, vector<int> &level, int &currentLevel, vector<vector<int>> &criticalEdges)
+void Graph::criticalDFS(int node, int &parent, bool visited[], vector<int> &lowestLevel, vector<int> &level, int &currentLevel, vector<vector<int>> &criticalEdges)
 {
     visited[node] = 1;
     lowestLevel[node] = level[node] = currentLevel;
@@ -330,7 +330,7 @@ void Graph::criticalConnections()
 {
     vector<int> level(numberOfNodes + 1, 0);
     vector<int> lowestLevel(numberOfNodes + 1, 0);
-    vector<int> visited(numberOfNodes + 1, 0);
+    bool visited[numberOfNodes + 1] = {0};
     vector<vector<int>> criticalEdges;
     int currentLevel, parent;
     currentLevel = 1;
