@@ -21,7 +21,7 @@
   https://infoarena.ro/problema/ctc  
   https://infoarena.ro/problema/biconex  
   https://leetcode.com/problems/critical-connections-in-a-network/  
-  https://infoarena.ro/problema/apm
-  https://infoarena.ro/problema/disjoint
-  https://infoarena.ro/problema/bellmanford
-  https://infoarena.ro/problema/dijkstra
+  https://infoarena.ro/problema/apm  
+  https://infoarena.ro/problema/disjoint  
+  https://infoarena.ro/problema/bellmanford  
+  https://infoarena.ro/problema/dijkstra  
