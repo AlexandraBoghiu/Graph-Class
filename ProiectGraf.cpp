@@ -35,8 +35,6 @@ public:
     bool HavelHakimi(vector<int>);
     vector<vector<int>> criticalConnections();
     vector<int> disjoint(vector<pair<int, pair<int, int>>>);
-    int find(int, vector<int> &);
-    void unite(int, int, vector<int> &);
 
 private:
     void DFS(int, vector<int> &);
@@ -44,21 +42,19 @@ private:
     void criticalDFS(int, int &, vector<int> &, vector<int> &, vector<int> &, int &, vector<vector<int>> &);
     void stronglyConnectedComponentsDFS(int, int &, vector<int> &, vector<int> &, vector<int> &, stack<int> &, vector<vector<int>> &);
     void biconnectedComponentsDFS(int, int &, int &, vector<int> &, vector<int> &, stack<int> &, vector<vector<int>> &);
+    int find(int, vector<int> &);
+    void unite(int, int, vector<int> &);
 };
 
 class WeightedGraph : public Graph
 {
 private:
-    vector<vector<int>> weightedEdges;
     vector<vector<edge>> listOfNeighboursWeight;
 
 public:
-    WeightedGraph(int numberOfNodes = 0, int numberOfEdges = 0, bool isDirected = 0, vector<vector<int>> listOfNeighbours = {}, vector<vector<int>> weightedEdges = {}) : Graph(numberOfNodes, numberOfEdges, isDirected, listOfNeighbours)
-    {
-        this->weightedEdges = weightedEdges;
-    }
+    WeightedGraph(int numberOfNodes = 0, int numberOfEdges = 0, bool isDirected = 0, vector<vector<int>> listOfNeighbours = {}) : Graph(numberOfNodes, numberOfEdges, isDirected, listOfNeighbours){}
     void setWeightedEdge(int, int, int);
-    vector<vector<int>> apm(vector<int> &, int &);
+    vector<int> apm(int, int &);
     vector<int> BellmanFord(int node);
     vector<int> Dijkstra(int node);
 };
@@ -70,7 +66,10 @@ void WeightedGraph::setWeightedEdge(int firstNode, int secondNode, int weight)
     edgeValues.weight = weight;
     listOfNeighboursWeight[firstNode].push_back(edgeValues);
     if (!this->isDirected)
+    {
+        edgeValues.second = firstNode;
         listOfNeighboursWeight[secondNode].push_back(edgeValues);
+    }
 }
 
 void Graph::setEdge(int firstNode, int secondNode)
@@ -253,20 +252,21 @@ vector<vector<int>> Graph::biconnectedComponents()
 }
 bool Graph::HavelHakimi(vector<int> degrees)
 {
-
-    sort(degrees.begin(), degrees.end(), greater<>());
-
-    while (1)
+  while (1)
     {
-        int node = degrees[0];
-        if (node == 0)
+        sort(degrees.begin(), degrees.end(), greater<>());
+
+        int currentDegree = degrees[0];
+
+        if (currentDegree == 0)
             return 1;
+
         degrees.erase(degrees.begin() + 0);
 
-        if (degrees.size() < node)
+        if (degrees.size() < currentDegree)
             return 0;
 
-        for (int i = 0; i < node; i++)
+        for (int i = 0; i < currentDegree; i++)
         {
             degrees[i]--;
 
@@ -354,34 +354,43 @@ bool comp(vector<int> first, vector<int> second)
 {
     return first[2] < second[2];
 }
-vector<vector<int>> WeightedGraph::apm(vector<int> &parent, int &totalWeight)
+vector<int> WeightedGraph::apm(int node, int &totalWeight)
 {
-    vector<vector<int>> solution;
-    int firstNode, secondNode, firstParent, secondParent, i = 0;
-    sort(weightedEdges.begin(), weightedEdges.end(), comp);
-    while (solution.size() < numberOfNodes - 1)
+    vector<int> minWeight(numberOfNodes + 1, INT_MAX);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pQueue;
+    vector<int> visited(numberOfNodes + 1, 0);
+    vector<int> parent(numberOfNodes + 1, 0);
+    minWeight[node] = 0;
+    pQueue.push({0, node});
+
+    while (!pQueue.empty())
     {
-        firstNode = weightedEdges[i][0];
-        secondNode = weightedEdges[i][1];
-        firstParent = firstNode;
-        secondParent = secondNode;
+        int currentNode = pQueue.top().second;
+        int currentWeight = pQueue.top().first;
+        pQueue.pop();
 
-        firstParent = find(firstNode, parent);
-        secondParent = find(secondNode, parent);
-        if (firstParent != secondParent)
+        if (!visited[currentNode])
         {
-            if (firstParent < secondParent)
-                parent[firstParent] = parent[secondParent];
+            visited[currentNode] = 1;
+            totalWeight += currentWeight;
+            for (auto it : listOfNeighboursWeight[currentNode])
+            {
+                if (!visited[it.second])
+                {
+                    int neighbour = it.second;
+                    int weight = it.weight;
 
-            else
-                parent[secondParent] = parent[firstParent];
-
-            solution.push_back({firstNode, secondNode});
-            totalWeight += weightedEdges[i][2];
+                    if (weight < minWeight[neighbour])
+                    {
+                        minWeight[neighbour] = weight;
+                        parent[neighbour] = currentNode;
+                        pQueue.push({minWeight[neighbour], neighbour});
+                    }
+                }
+            }
         }
-        i++;
     }
-    return solution;
+    return parent;
 }
 vector<int> WeightedGraph::BellmanFord(int node)
 {
@@ -426,31 +435,31 @@ vector<int> WeightedGraph::Dijkstra(int node)
 {
     vector<int> minWeight(numberOfNodes + 1, INT_MAX);
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pQueue;
-
+    vector<int> visited(numberOfNodes + 1, 0);
     minWeight[node] = 0;
-    pQueue.push({node, 0});
+    pQueue.push({0, node});
 
     while (!pQueue.empty())
     {
-        int currentNode = pQueue.top().first;
+        int currentNode = pQueue.top().second;
         pQueue.pop();
 
-        for (auto it : listOfNeighboursWeight[currentNode])
+        if (!visited[currentNode])
         {
-            int neighbour = it.second;
-            int weight = it.weight;
-
-            if (minWeight[currentNode] + weight < minWeight[neighbour])
+            visited[currentNode] = 1;
+            for (auto it : listOfNeighboursWeight[currentNode])
             {
-                minWeight[neighbour] = minWeight[currentNode] + weight;
-                pQueue.push({neighbour, minWeight[neighbour]});
+                int neighbour = it.second;
+                int weight = it.weight;
+
+                if (minWeight[currentNode] + weight < minWeight[neighbour])
+                {
+                    minWeight[neighbour] = minWeight[currentNode] + weight;
+                    pQueue.push({minWeight[neighbour], neighbour});
+                }
             }
         }
     }
-    for (int i = 2; i <= numberOfNodes; i++)
-        if (minWeight[i] == INT_MAX)
-            minWeight[i] = 0;
-
     return minWeight;
 }
 void DFSinfoarena()
@@ -582,13 +591,14 @@ void HavelHakimiRez()
     ofstream out("graph.out");
     int number, degree;
     vector<int> degrees(number + 1);
+    in >> number;
     for (int i = 0; i < number; i++)
     {
         in >> degree;
         degrees.push_back(degree);
     }
-
-    //  out << Gr.HavelHakimi(degrees);
+    Graph Gr;
+    out << Gr.HavelHakimi(degrees);
 }
 void disjointInfoarena()
 {
@@ -617,25 +627,18 @@ void apmInfoarena()
     ofstream out("apm.out");
     int numberOfNodes, numberOfEdges, firstNode, secondNode, weight;
     in >> numberOfNodes >> numberOfEdges;
-    vector<vector<int>> listOfNeighbours(numberOfNodes + 1, {0});
-    vector<vector<int>> weightedEdges;
+    WeightedGraph Gr(numberOfNodes, numberOfEdges, 0);
     for (int i = 0; i < numberOfEdges; i++)
     {
         in >> firstNode >> secondNode >> weight;
-        weightedEdges.push_back({firstNode, secondNode, weight});
+        Gr.setWeightedEdge(firstNode, secondNode, weight);
     }
-
-    WeightedGraph Gr(numberOfNodes, numberOfEdges, 0, listOfNeighbours, weightedEdges);
-
-    vector<int> parent(numberOfNodes + 1);
-    for (int i = 1; i < parent.size(); i++)
-        parent[i] = i;
     int totalWeight = 0;
-    vector<vector<int>> solution = Gr.apm(parent, totalWeight);
+    vector<int> solution = Gr.apm(1, totalWeight);
     out << totalWeight << '\n'
-        << solution.size() << '\n';
-    for (int i = 0; i < solution.size(); i++)
-        out << solution[i][0] << " " << solution[i][1] << '\n';
+        << solution.size() - 2 << '\n';
+    for (int i = 2; i < solution.size(); i++)
+        out << i << " " << solution[i] << '\n';
 }
 void BellmanFordInfoarena()
 {
@@ -674,7 +677,10 @@ void DijkstraInfoarena()
 
     vector<int> minWeight = Gr.Dijkstra(1);
     for (int i = 2; i < minWeight.size(); i++)
-        out << minWeight[i] << " ";
+        if (minWeight[i] != INT_MAX)
+            out << minWeight[i] << " ";
+        else
+            out << "0 ";
 }
 int main()
 {
@@ -686,6 +692,7 @@ int main()
     //CCNleetcode();
     //HavelHakimiRez();
     //disjointInfoarena();
+    //apmInfoarena();
     //BellmanFordInfoarena();
     //DijkstraInfoarena();
     return 0;
