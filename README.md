@@ -8,10 +8,10 @@
   - [x] Strongly Connected Components
   - [x] Biconnected Components
   - [x] Critical Connections in a Network
-  - [ ] Havel Hakimi
+  - [x] Havel Hakimi
   - [x] MST
   - [x] Bellman-Ford
-  - [ ] Dijkstra
+  - [x] Dijkstra
   - [x] Prim
   - [x] Disjoint sets
 
