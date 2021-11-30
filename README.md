@@ -14,6 +14,7 @@
   - [x] Dijkstra
   - [x] Prim
   - [x] Disjoint sets
+  - [x] Floyd–Warshall
 
   https://infoarena.ro/problema/dfs  
   https://infoarena.ro/problema/bfs  
@@ -25,3 +26,5 @@
   https://infoarena.ro/problema/disjoint  
   https://infoarena.ro/problema/bellmanford  
   https://infoarena.ro/problema/dijkstra  
+  https://www.infoarena.ro/problema/royfloyd  
+  
