@@ -52,11 +52,12 @@ private:
     vector<vector<edge>> listOfNeighboursWeight;
 
 public:
-    WeightedGraph(int numberOfNodes = 0, int numberOfEdges = 0, bool isDirected = 0, vector<vector<int>> listOfNeighbours = {}) : Graph(numberOfNodes, numberOfEdges, isDirected, listOfNeighbours){}
+    WeightedGraph(int numberOfNodes = 0, int numberOfEdges = 0, bool isDirected = 0, vector<vector<int>> listOfNeighbours = {}) : Graph(numberOfNodes, numberOfEdges, isDirected, listOfNeighbours) {}
     void setWeightedEdge(int, int, int);
     vector<int> apm(int, int &);
     vector<int> BellmanFord(int node);
     vector<int> Dijkstra(int node);
+    vector<vector<edge>> RoyFloyd();
 };
 void WeightedGraph::setWeightedEdge(int firstNode, int secondNode, int weight)
 {
@@ -252,7 +253,7 @@ vector<vector<int>> Graph::biconnectedComponents()
 }
 bool Graph::HavelHakimi(vector<int> degrees)
 {
-  while (1)
+    while (1)
     {
         sort(degrees.begin(), degrees.end(), greater<>());
 
@@ -461,6 +462,19 @@ vector<int> WeightedGraph::Dijkstra(int node)
         }
     }
     return minWeight;
+}
+vector<vector<edge>> WeightedGraph::RoyFloyd()
+{
+    vector<vector<edge>> solution = listOfNeighboursWeight;
+
+    for (int k = 0; k < numberOfNodes; k++)
+        for (int i = 0; i < numberOfNodes; i++)
+            for (int j = 0; j < numberOfNodes; j++)
+            {
+                if (i != j && solution[i][k].weight && solution[k][j].weight && (!solution[i][j].weight || solution[i][j].weight > solution[i][k].weight + solution[k][j].weight))
+                    solution[i][j].weight = solution[i][k].weight + solution[k][j].weight;
+            }
+    return solution;
 }
 void DFSinfoarena()
 {
@@ -682,6 +696,27 @@ void DijkstraInfoarena()
         else
             out << "0 ";
 }
+void RoyFloydInfoarena()
+{
+    ifstream in("royfloyd.in");
+    ofstream out("royfloyd.out");
+    int numberOfNodes, firstNode, secondNode, weight;
+    in >> numberOfNodes;
+    WeightedGraph Gr(numberOfNodes, 0, 1);
+    for (int i = 0; i < numberOfNodes; i++)
+        for (int j = 0; j < numberOfNodes; j++)
+        {
+            in >> weight;
+            Gr.setWeightedEdge(i, j, weight);
+        }
+    vector<vector<edge>> solution = Gr.RoyFloyd();
+    for (int i = 0; i < numberOfNodes; i++)
+    {
+        for (int j = 0; j < numberOfNodes; j++)
+            out << solution[i][j].weight << " ";
+        out << "\n";
+    }
+}
 int main()
 {
     //DFSinfoarena();
@@ -695,5 +730,6 @@ int main()
     //apmInfoarena();
     //BellmanFordInfoarena();
     //DijkstraInfoarena();
+    RoyFloydInfoarena();
     return 0;
 }
