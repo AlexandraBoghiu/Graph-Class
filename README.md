@@ -15,6 +15,7 @@
   - [x] Prim
   - [x] Disjoint sets
   - [x] Floyd–Warshall
+  - [x] Eulerian Circuit
 
   https://infoarena.ro/problema/dfs  
   https://infoarena.ro/problema/bfs  
@@ -27,4 +28,5 @@
   https://infoarena.ro/problema/bellmanford  
   https://infoarena.ro/problema/dijkstra  
   https://www.infoarena.ro/problema/royfloyd  
+  https://infoarena.ro/problema/ciclueuler (60p, TLE) 
   
