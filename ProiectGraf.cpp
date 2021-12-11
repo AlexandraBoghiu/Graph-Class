@@ -35,6 +35,8 @@ public:
     bool HavelHakimi(vector<int>);
     vector<vector<int>> criticalConnections();
     vector<int> disjoint(vector<pair<int, pair<int, int>>>);
+    int treeDiameter();
+    void eulerianCircuit(int node, vector<int> &, vector<vector<int>> &, vector<vector<int>> &, vector<int> &);
 
 private:
     void DFS(int, vector<int> &);
@@ -350,7 +352,48 @@ vector<int> Graph::disjoint(vector<pair<int, pair<int, int>>> tasks)
     }
     return solution;
 }
+int Graph::treeDiameter()
+{
+    vector<int> visited(numberOfNodes + 1, 0);
+    vector<int> distance = BFS(1, visited);
+    int last, max = -1;
+    for (int i = 1; i < distance.size(); i++)
+        if (distance[i] > max)
+        {
+            max = distance[i];
+            last = i;
+        }
 
+    for (int i = 0; i < visited.size(); i++)
+        visited[i] = 0;
+
+    distance = BFS(last, visited);
+    max = -1;
+
+    for (int i = 1; i < distance.size(); i++)
+        if (distance[i] > max)
+            max = distance[i];
+
+    return max + 1;
+}
+void Graph::eulerianCircuit(int node, vector<int> &visited, vector<vector<int>> &edgeNumber, vector<vector<int>> &listOfNeighboursCopy, vector<int> &solution)
+{
+    while (!listOfNeighboursCopy[node].empty())
+    {
+        int neighbour = listOfNeighboursCopy[node].back();
+        int edge = edgeNumber[node].back();
+
+        listOfNeighboursCopy[node].pop_back();
+        edgeNumber[node].pop_back();
+
+        if (!visited[edge])
+        {
+            visited[edge] = 1;
+            eulerianCircuit(neighbour, visited, edgeNumber, listOfNeighboursCopy, solution);
+        }
+    }
+    solution.push_back(node);
+}
 bool comp(vector<int> first, vector<int> second)
 {
     return first[2] < second[2];
@@ -476,6 +519,7 @@ vector<vector<edge>> WeightedGraph::RoyFloyd()
             }
     return solution;
 }
+
 void DFSinfoarena()
 {
     ifstream in("dfs.in");
@@ -717,6 +761,62 @@ void RoyFloydInfoarena()
         out << "\n";
     }
 }
+void darbInfoarena()
+{
+    ifstream in("darb.in");
+    ofstream out("darb.out");
+    int numberOfNodes, firstNode, secondNode, weight;
+    in >> numberOfNodes;
+    Graph Gr(numberOfNodes, numberOfNodes, 0);
+    for (int i = 1; i <= numberOfNodes; i++)
+    {
+        in >> firstNode >> secondNode;
+        Gr.setEdge(firstNode, secondNode);
+    }
+    int result = Gr.treeDiameter();
+    out << result;
+}
+void eulerianInfoarena()
+{
+    ifstream in("ciclueuler.in");
+    ofstream out("ciclueuler.out");
+    int numberOfNodes, numberOfEdges, firstNode, secondNode, weight;
+
+    in >> numberOfNodes >> numberOfEdges;
+
+    vector<vector<int>> listOfNeighboursCopy(numberOfNodes + 1), edgeNumber(numberOfNodes + 1);
+    vector<int> degrees(numberOfNodes + 1, 0), visited(numberOfEdges + 1, 0);
+    Graph Gr(numberOfNodes, numberOfEdges, 0);
+
+    for (int i = 1; i <= numberOfEdges; i++)
+    {
+        in >> firstNode >> secondNode;
+        Gr.setEdge(firstNode, secondNode);
+        degrees[firstNode] += 1;
+        degrees[secondNode] += 1;
+        edgeNumber[firstNode].push_back(i);
+        edgeNumber[secondNode].push_back(i);
+        listOfNeighboursCopy[firstNode].push_back(secondNode);
+        listOfNeighboursCopy[secondNode].push_back(firstNode);
+    }
+    int ok = 0;
+    for (int i = 0; i < numberOfNodes; i++)
+        if (degrees[i] % 2)
+        {
+            out << -1;
+            ok = 1;
+            break;
+        }
+    if (!ok)
+    {
+        vector<int> solution;
+        Gr.eulerianCircuit(1, visited, edgeNumber, listOfNeighboursCopy, solution);
+
+        for (int i = 0; i < solution.size() - 1; i++)
+            out << solution[i] << " ";
+    }
+}
+
 int main()
 {
     //DFSinfoarena();
@@ -730,6 +830,8 @@ int main()
     //apmInfoarena();
     //BellmanFordInfoarena();
     //DijkstraInfoarena();
-    RoyFloydInfoarena();
+    //RoyFloydInfoarena();
+    //darbInfoarena();
+    eulerianInfoarena();
     return 0;
 }
