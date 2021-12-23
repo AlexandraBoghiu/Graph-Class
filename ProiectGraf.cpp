@@ -93,6 +93,7 @@ void Graph::printListOfNeighbours() const
     }
 }
 void Graph::DFS(int node, vector<int> &visited)
+//DFS algorithm; O(m + n)
 {
     visited[node] = 1;
     for (int neighbour : listOfNeighbours[node])
@@ -102,6 +103,7 @@ void Graph::DFS(int node, vector<int> &visited)
     }
 }
 int Graph::numberOfConnectedComponents(vector<int> &visited)
+//O(m + n); returns the number of connected components
 {
     int numberOfConnectedComponents = 0;
     for (int i = 1; i <= this->numberOfNodes; i++)
@@ -116,6 +118,7 @@ int Graph::numberOfConnectedComponents(vector<int> &visited)
 }
 
 vector<int> Graph::BFS(int sourceNode, vector<int> &visited)
+//BFS algorithm; O(m + n); returns the minimum number of edges between the sourceNode and the other nodes
 {
     vector<int> distance(numberOfNodes + 1, 0);
     queue<int> queueBFS;
@@ -138,6 +141,7 @@ vector<int> Graph::BFS(int sourceNode, vector<int> &visited)
 }
 
 void Graph::topologicalSortingDFS(int node, vector<int> &visited, stack<int> &stack)
+//DFS for topological sorting; O(m + n); the stack stores the result
 {
     visited[node] = 1;
     for (int neighbour : listOfNeighbours[node])
@@ -149,6 +153,7 @@ void Graph::topologicalSortingDFS(int node, vector<int> &visited, stack<int> &st
 }
 
 stack<int> Graph::topologicalSorting(vector<int> &visited, stack<int> &stack)
+//topological sort function; it uses topologicalSortingDFS(); returns a stack = the result
 {
     for (int i = 1; i <= this->numberOfNodes; i++)
     {
@@ -158,6 +163,7 @@ stack<int> Graph::topologicalSorting(vector<int> &visited, stack<int> &stack)
     return stack;
 }
 void Graph::stronglyConnectedComponentsDFS(int node, int &currentLevel, vector<int> &level, vector<int> &lowestLevel, vector<int> &onStack, stack<int> &stack, vector<vector<int>> &solution)
+//Tarjan's algorithm; O(m + n); stores the result in "vector<vector<int>> solution"
 {
     stack.push(node);
     onStack[node] = 1;
@@ -190,6 +196,7 @@ void Graph::stronglyConnectedComponentsDFS(int node, int &currentLevel, vector<i
 }
 
 vector<vector<int>> Graph::stronglyConnectedComponents()
+//returns strongly connected components; A directed graph is strongly connected if there is a path between all pairs of vertices; uses stronglyConnectedComponentsDFS()
 {
 
     int currentLevel = 1;
@@ -206,6 +213,7 @@ vector<vector<int>> Graph::stronglyConnectedComponents()
     return solution;
 }
 void Graph::biconnectedComponentsDFS(int node, int &parent, int &currentLevel, vector<int> &level, vector<int> &lowestLevel, stack<int> &stack, vector<vector<int>> &solution)
+//stores biconnected components in "vector<vector<int>> solution"; O(m + n); A graph is biconnected if it is possible to reach every vertex from every other vertex, by a simple path and even after removing any vertex the graph remains connected.
 {
     stack.push(node);
     level[node] = lowestLevel[node] = currentLevel;
@@ -240,6 +248,7 @@ void Graph::biconnectedComponentsDFS(int node, int &parent, int &currentLevel, v
     }
 }
 vector<vector<int>> Graph::biconnectedComponents()
+//returns biconnected components; uses biconnectedComponentsDFS()
 {
     int currentLevel = 1;
     stack<int> stack;
@@ -254,6 +263,7 @@ vector<vector<int>> Graph::biconnectedComponents()
     return solution;
 }
 bool Graph::HavelHakimi(vector<int> degrees)
+//checks if a degree sequence can form a simple graph; O(n^2 log n)
 {
     while (1)
     {
@@ -279,6 +289,7 @@ bool Graph::HavelHakimi(vector<int> degrees)
     }
 }
 void Graph::criticalDFS(int node, int &parent, vector<int> &visited, vector<int> &lowestLevel, vector<int> &level, int &currentLevel, vector<vector<int>> &criticalEdges)
+//Tarjan's algorithm; O(m + n); A critical edge is an edge that, if removed, will make some nodes unable to reach some other node; stores all critical edges in "vector<vector<int>> criticalEdges"
 {
     visited[node] = 1;
     lowestLevel[node] = level[node] = currentLevel;
@@ -301,6 +312,7 @@ void Graph::criticalDFS(int node, int &parent, vector<int> &visited, vector<int>
     }
 }
 vector<vector<int>> Graph::criticalConnections()
+//returns critical edges; uses criticalDFS()
 {
     vector<int> level(numberOfNodes + 1, 0);
     vector<int> lowestLevel(numberOfNodes + 1, 0);
@@ -313,6 +325,7 @@ vector<vector<int>> Graph::criticalConnections()
     return criticalEdges;
 }
 int Graph::find(int node, vector<int> &root)
+//checks if two elements are om the same set
 {
     if (root[node] != node)
         root[node] = find(root[node], root);
@@ -320,6 +333,7 @@ int Graph::find(int node, vector<int> &root)
     return root[node];
 }
 void Graph::unite(int x, int y, vector<int> &root)
+//unites the sets that contain x and y (x and y are not in the same set)
 {
     int firstRoot, secondRoot;
     firstRoot = find(x, root);
@@ -328,6 +342,7 @@ void Graph::unite(int x, int y, vector<int> &root)
 }
 
 vector<int> Graph::disjoint(vector<pair<int, pair<int, int>>> tasks)
+//executes operation 1 (unite) or operation 2 (find)
 {
     vector<int> root(numberOfNodes + 1);
     vector<int> solution;
@@ -353,6 +368,7 @@ vector<int> Graph::disjoint(vector<pair<int, pair<int, int>>> tasks)
     return solution;
 }
 int Graph::treeDiameter()
+//returns the diameter of a tree = the length of the path between the farthest 2 leaves; O(m + n)
 {
     vector<int> visited(numberOfNodes + 1, 0);
     vector<int> distance = BFS(1, visited);
@@ -377,6 +393,7 @@ int Graph::treeDiameter()
     return max + 1;
 }
 void Graph::eulerianCircuit(int node, vector<int> &visited, vector<vector<int>> &edgeNumber, vector<vector<int>> &listOfNeighboursCopy, vector<int> &solution)
+//stores an eulerian circuit in "vector<int> solution"; O(n^2); An Eulerian circuit visits every edge exactly once
 {
     while (!listOfNeighboursCopy[node].empty())
     {
@@ -399,6 +416,7 @@ bool comp(vector<int> first, vector<int> second)
     return first[2] < second[2];
 }
 vector<int> WeightedGraph::apm(int node, int &totalWeight)
+//Minimum spanning tree; O(m log n)
 {
     vector<int> minWeight(numberOfNodes + 1, INT_MAX);
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pQueue;
@@ -437,6 +455,7 @@ vector<int> WeightedGraph::apm(int node, int &totalWeight)
     return parent;
 }
 vector<int> WeightedGraph::BellmanFord(int node)
+//Bellman-Ford algorithm; O(nm log n)
 {
     vector<int> inQueue(numberOfNodes + 1, 0);
     vector<int> minWeight(numberOfNodes + 1, INT_MAX);
@@ -476,6 +495,7 @@ vector<int> WeightedGraph::BellmanFord(int node)
     return minWeight;
 }
 vector<int> WeightedGraph::Dijkstra(int node)
+//Dijkstra algorithm; O(m log n)
 {
     vector<int> minWeight(numberOfNodes + 1, INT_MAX);
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pQueue;
@@ -507,6 +527,7 @@ vector<int> WeightedGraph::Dijkstra(int node)
     return minWeight;
 }
 vector<vector<edge>> WeightedGraph::RoyFloyd()
+//Roy-Floyd/Roy-Warshall algorithm;  O(n ^ 2)
 {
     vector<vector<edge>> solution = listOfNeighboursWeight;
 
@@ -520,20 +541,27 @@ vector<vector<edge>> WeightedGraph::RoyFloyd()
     return solution;
 }
 
+//Next functions are helpers for infoarena problems
+
 void DFSinfoarena()
 {
     ifstream in("dfs.in");
     ofstream out("dfs.out");
     int numberOfNodes, numberOfEdges, firstNode, secondNode;
     in >> numberOfNodes >> numberOfEdges;
-    Graph Gr(numberOfNodes, numberOfEdges, 0);
-    for (int i = 1; i <= numberOfEdges; i++)
+    if (numberOfEdges == 0)
+        out << numberOfNodes;
+    else
     {
-        in >> firstNode >> secondNode;
-        Gr.setEdge(firstNode, secondNode);
+        Graph Gr(numberOfNodes, numberOfEdges, 0);
+        for (int i = 1; i <= numberOfEdges; i++)
+        {
+            in >> firstNode >> secondNode;
+            Gr.setEdge(firstNode, secondNode);
+        }
+        vector<int> visited(numberOfNodes + 1, 0);
+        out << Gr.numberOfConnectedComponents(visited);
     }
-    vector<int> visited(numberOfNodes + 1, 0);
-    out << Gr.numberOfConnectedComponents(visited);
 }
 void BFSinfoarena()
 {
@@ -819,7 +847,7 @@ void eulerianInfoarena()
 
 int main()
 {
-    //DFSinfoarena();
+    DFSinfoarena();
     //BFSinfoarena();
     //sortaretInfoarena();
     //ctcInfoarena();
@@ -832,6 +860,6 @@ int main()
     //DijkstraInfoarena();
     //RoyFloydInfoarena();
     //darbInfoarena();
-    eulerianInfoarena();
+    //eulerianInfoarena();
     return 0;
 }
